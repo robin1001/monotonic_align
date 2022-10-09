@@ -1,0 +1,3 @@
+include README.md
+include _core.pyx
+recursive-include py *.py

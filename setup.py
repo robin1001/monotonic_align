@@ -5,13 +5,16 @@ import numpy
 with open("README.md", "r", encoding="utf8") as fh:
     long_description = fh.read()
 
+package_name = 'monotonic_align'
+
 setup(
-  name = 'monotonic_align',
-  version='0.0.2',
-  packages=find_packages(),
-  ext_modules = cythonize("core.pyx"),
+  name=package_name,
+  version='0.0.3',
+  packages=[package_name],
+  package_dir={package_name: 'py'},
+  ext_modules = cythonize("_core.pyx"),
   include_dirs=[numpy.get_include()],
-  setup_requires=["Cython==0.29.21", "numpy==1.18.5"],
+  install_requires=["Cython", "numpy"],
   long_description=long_description,
   long_description_content_type="text/markdown",
   description="Monotonic Align",

@@ -4,43 +4,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_wheels:
-    name: Build wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-20.04]
+  build:
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-
-      # Used to host cibuildwheel
-      - uses: actions/setup-python@v3
-        with:
-          python-version: '3.7'
-
-      - name: Install cibuildwheel
-        run: |
-          pip install cibuildwheel==2.10.2
-
-      - name: Build wheels
-        run: python -m cibuildwheel --output-dir wheelhouse
-        env:
-          CIBW_BEFORE_BUILD: pip install -r requirements.txt
-          CIBW_BUILD_VERBOSITY: 1
-          CIBW_BUILD: "cp37-* cp38-* cp39-*"
-          # Disable building PyPy wheels on all platforms
-          # Skip 32-bit builds
-          CIBW_SKIP: "pp* *-win32 *-manylinux_i686 *-musllinux_*"
-
-      - uses: actions/upload-artifact@v2
-        with:
-          path: ./wheelhouse/*.whl
+      - name: Fetch
+        uses: actions/checkout@v2
 
       - name: Publish on pypi.org
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
+          pip install -r requirements.txt
+          python setup.py sdist
           python -m pip install -U twine
-          python -m twine upload --skip-existing ./wheelhouse/*
+          python -m twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
